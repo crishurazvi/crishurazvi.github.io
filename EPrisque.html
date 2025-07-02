@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evaluare risc EP - ESC 2019</title>
+<style>
+:root{
+    --color-high:#c8102e;
+    --color-intermediate-high:#e85e0c;
+    --color-intermediate-low:#d4af00;
+    --color-low:#009845;
+}
+body{
+    font-family:"Segoe UI",Helvetica,Arial,sans-serif;
+    margin:0;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    min-height:100vh;
+    background:linear-gradient(135deg,#e0f7fa 0%,#ffffff 100%);
+}
+.container{
+    background:#fff;
+    padding:2rem;
+    margin:2rem 0;
+    border-radius:12px;
+    box-shadow:0 4px 12px rgba(0,0,0,.1);
+    max-width:600px;
+    width:90%;
+}
+h1{
+    text-align:center;
+    margin-bottom:1.5rem;
+}
+fieldset{
+    border:none;
+    margin-bottom:1rem;
+}
+legend{
+    font-weight:600;
+    margin-bottom:.5rem;
+}
+.radio-group{
+    display:flex;
+    gap:1rem;
+    flex-wrap:wrap;
+}
+.radio-group label{
+    display:flex;
+    align-items:center;
+    gap:.25rem;
+    font-size:.95rem;
+}
+input[type="radio"]{
+    accent-color:#007bff;
+}
+.btn{
+    display:block;
+    width:100%;
+    padding:.75rem;
+    font-size:1rem;
+    border:none;
+    border-radius:8px;
+    background:#007bff;
+    color:#fff;
+    cursor:pointer;
+    transition:background .2s;
+}
+.btn:hover{background:#0069d9;}
+.result{
+    margin-top:1.5rem;
+    padding:1rem;
+    border-radius:8px;
+    text-align:center;
+    font-size:1.1rem;
+    font-weight:bold;
+}
+.hidden{display:none;}
+.high{background:var(--color-high); color:#fff;}
+.intermediate-high{background:var(--color-intermediate-high); color:#fff;}
+.intermediate-low{background:var(--color-intermediate-low); color:#000;}
+.low{background:var(--color-low); color:#fff;}
+.disclaimer{
+    margin-top:1.5rem;
+    font-size:.8rem;
+    color:#555;
+    text-align:center;
+}
+</style>
+</head>
+<body>
+    <main class="container">
+        <h1>Evaluarea Riscului de Embolie Pulmonară<br><small>(ESC 2019)</small></h1>
+        <form id="riskForm">
+            <fieldset>
+                <legend>Instabilitate hemodinamică?</legend>
+                <div class="radio-group">
+                    <label><input type="radio" name="hemo" value="yes" required> Da</label>
+                    <label><input type="radio" name="hemo" value="no"> Nu</label>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>PESI clasa III‑IV <em>și/sau</em> sPESI ≥1?</legend>
+                <div class="radio-group">
+                    <label><input type="radio" name="pesi" value="yes" required> Da</label>
+                    <label><input type="radio" name="pesi" value="no"> Nu</label>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Disfuncție VD (ECO/CT)?</legend>
+                <div class="radio-group">
+                    <label><input type="radio" name="rv" value="yes" required> Da</label>
+                    <label><input type="radio" name="rv" value="no"> Nu</label>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Troponină cardiacă crescută?</legend>
+                <div class="radio-group">
+                    <label><input type="radio" name="troponin" value="yes" required> Da</label>
+                    <label><input type="radio" name="troponin" value="no"> Nu</label>
+                </div>
+            </fieldset>
+
+            <button type="button" id="calcBtn" class="btn">Calculează riscul</button>
+        </form>
+
+        <div id="riskResult" class="result hidden"></div>
+
+        <p class="disclaimer">⚠️ Această aplicație are scop educativ și nu înlocuiește evaluarea medicală calificată. Consultați un specialist pentru decizii clinice.</p>
+    </main>
+<script>
+function getRadioVal(name){
+    const group=document.querySelectorAll('input[name="'+name+'"]');
+    for(const r of group){if(r.checked)return r.value;}
+    return null;
+}
+function computeRisk(){
+    const hemo=getRadioVal('hemo');
+    const pesi=getRadioVal('pesi');
+    const rv=getRadioVal('rv');
+    const troponin=getRadioVal('troponin');
+    const resEl=document.getElementById('riskResult');
+    let risk='', cls='';
+    if(hemo==='yes'){
+        risk='Risc Înalt';
+        cls='high';
+    }else{
+        if(pesi==='no' && rv==='no' && troponin==='no'){
+            risk='Risc Scăzut';
+            cls='low';
+        }else{
+            const markerCount=(rv==='yes'?1:0)+(troponin==='yes'?1:0);
+            if(markerCount===2){
+                risk='Risc Intermediar-Înalt';
+                cls='intermediate-high';
+            }else{
+                risk='Risc Intermediar-Scăzut';
+                cls='intermediate-low';
+            }
+        }
+    }
+    resEl.textContent=risk;
+    resEl.className='result '+cls;
+}
+
+document.getElementById('calcBtn').addEventListener('click',computeRisk);
+</script>
+</body>
+</html>
