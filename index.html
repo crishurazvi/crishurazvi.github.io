@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapport d'Échocardiographie Interactif Complet</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f9; --card-bg-color: #ffffff; --text-color: #333333; --header-color: #2c3e50;
+            --border-color: #e0e0e0; --primary-color: #3498db; --table-header-bg: #f8f9fa;
+            --info-bg-color: #eaf5fc; --info-border-color: #bce0f7;
+            --editable-hover-bg: rgba(52, 152, 219, 0.1); --editable-focus-bg: rgba(52, 152, 219, 0.15);
+        }
+        body.dark-mode {
+            --bg-color: #1c2128; --card-bg-color: #2d333b; --text-color: #cdd9e5; --header-color: #58a6ff;
+            --border-color: #444c56; --primary-color: #58a6ff; --table-header-bg: #22272e;
+            --info-bg-color: #222b38; --info-border-color: #385f89;
+            --editable-hover-bg: rgba(88, 166, 255, 0.15); --editable-focus-bg: rgba(88, 166, 255, 0.2);
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; transition: background-color 0.3s, color 0.3s; line-height: 1.6; }
+        .report-container { max-width: 800px; margin: 20px auto; background-color: var(--card-bg-color); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07); overflow: hidden; }
+        @media print {
+            body { background-color: #fff; color: #000; padding: 0; }
+            .report-container { box-shadow: none; border: none; max-width: 100%; margin: 0; }
+            .report-header-actions, footer, .info-box { display: none !important; }
+            [contenteditable="true"] { border: none !important; box-shadow: none !important; background-color: transparent !important; }
+            :root, body.dark-mode { --bg-color: #ffffff; --card-bg-color: #ffffff; --text-color: #000000; --header-color: #000000; --border-color: #cccccc; --primary-color: #000000; --table-header-bg: #f2f2f2; }
+        }
+        .report-header { padding: 20px 25px; background-color: var(--bg-color); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: flex-start; }
+        .report-header h1 { margin: 0; color: var(--header-color); font-size: 24px; }
+        .patient-info { font-size: 14px; margin-top: 10px; }
+        .patient-info strong { display: inline-block; min-width: 150px; }
+        .report-header-actions { display: flex; gap: 10px; }
+        .action-button { background-color: transparent; border: 1px solid var(--border-color); color: var(--text-color); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 6px; transition: background-color 0.2s, border-color 0.2s; }
+        .action-button:hover { background-color: var(--table-header-bg); }
+        .action-button svg { width: 16px; height: 16px; fill: currentColor; }
+        main { padding: 25px; }
+        section { margin-bottom: 25px; }
+        h2 { font-size: 18px; color: var(--header-color); border-bottom: 2px solid var(--primary-color); padding-bottom: 8px; margin-bottom: 15px; }
+        h3 { font-size: 16px; color: var(--text-color); margin-top: 20px; margin-bottom: 10px; font-weight: 600; }
+        [contenteditable="true"] { cursor: text; padding: 2px 5px; border-radius: 4px; transition: background-color 0.2s, box-shadow 0.2s; display: inline-block; min-width: 30px; }
+        [contenteditable="true"]:hover { background-color: var(--editable-hover-bg); }
+        [contenteditable="true"]:focus { outline: none; background-color: var(--editable-focus-bg); box-shadow: 0 0 0 2px var(--primary-color); }
+        .measure-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .measure-table th, .measure-table td { padding: 10px 8px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .measure-table thead th { background-color: var(--table-header-bg); font-weight: 600; }
+        .measure-table td:nth-child(2) { text-align: center; font-weight: 500; }
+        .measure-table td:nth-child(3) { text-align: center; color: #78909c; }
+        body.dark-mode .measure-table td:nth-child(3) { color: #8b949e; }
+        .interpretation-list { list-style-type: none; padding-left: 0; }
+        .interpretation-list li { margin-bottom: 8px; }
+        .interpretation-list li strong { margin-right: 5px; }
+        #conclusion-section p { background-color: var(--bg-color); border-left: 4px solid var(--primary-color); padding: 15px; border-radius: 4px; }
+        .info-box { padding: 12px 15px; margin-bottom: 20px; background-color: var(--info-bg-color); border: 1px solid var(--info-border-color); border-radius: 6px; font-size: 13px; display: flex; align-items: center; gap: 10px; }
+        .info-box svg { flex-shrink: 0; width: 18px; height: 18px; fill: var(--primary-color); }
+        footer { text-align: center; padding: 15px; font-size: 12px; color: #78909c; border-top: 1px solid var(--border-color); }
+        body.dark-mode footer { color: #8b949e; }
+    </style>
+</head>
+<body>
+
+    <div class="report-container">
+        <header class="report-header">
+            <div>
+                <h1>Rapport d'Échocardiographie</h1>
+                <div class="patient-info">
+                    <strong>PATIENT :</strong> <span contenteditable="true" id="patient-name">NOM, Prénom</span><br>
+                    <strong>DATE DE NAISSANCE :</strong> <span contenteditable="true" id="patient-dob">JJ/MM/AAAA</span><br>
+                    <strong>DATE DE L'EXAMEN :</strong> <span contenteditable="true" id="exam-date">JJ/MM/AAAA</span><br>
+                    <strong>MÉDECIN PRESCRIPTEUR :</strong> <span contenteditable="true" id="prescribing-md">Dr. X</span>
+                </div>
+            </div>
+            <div class="report-header-actions">
+                <button id="theme-toggle" class="action-button" title="Changer le thème">
+                    <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V18.75a.75.75 0 01.75-.75zM5.106 17.834a.75.75 0 001.06 1.06l1.591-1.59a.75.75 0 00-1.06-1.061l-1.591 1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM5.106 6.166a.75.75 0 00-1.06 1.06l1.59 1.591a.75.75 0 101.061-1.06l-1.59-1.591z"/></svg>
+                    <svg id="theme-icon-sun" style="display:none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.981A10.503 10.503 0 0112 22.5 10.5 10.5 0 011.5 12c0-5.42 4.135-9.92 9.528-10.282z"/></svg>
+                </button>
+                <button id="print-button" class="action-button" title="Imprimer">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 2.5A2.5 2.5 0 0110.5 0h3A2.5 2.5 0 0116 2.5v2.5h-8V2.5zM3 9.5A2.5 2.5 0 015.5 7h13A2.5 2.5 0 0121 9.5v7a2.5 2.5 0 01-2.5 2.5h-13A2.5 2.5 0 013 16.5v-7zM5.5 9a.5.5 0 00-.5.5v7a.5.5 0 00.5.5h13a.5.5 0 00.5-.5v-7a.5.5 0 00-.5-.5h-13zM6 15.5a1 1 0 011-1h10a1 1 0 110 2H7a1 1 0 01-1-1z"/></svg>
+                </button>
+                <button id="copy-button" class="action-button" title="Copier le rapport complet">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7.5 1.5a2.5 2.5 0 00-2.5 2.5v12.5a2.5 2.5 0 002.5 2.5h8a2.5 2.5 0 002.5-2.5V8.879a2.5 2.5 0 00-.732-1.768l-4.243-4.242A2.5 2.5 0 0011.379 2H7.5zM7.5 3.5h3.5v4a1 1 0 001 1h4v8a1 1 0 01-1 1h-8a1 1 0 01-1-1V4a1 1 0 011-1zM19.5 8.5h-4a1 1 0 01-1-1v-4a1 1 0 112 0v2.5h2.5a1 1 0 110 2z"/></svg>
+                    <span id="copy-button-text">Copier Rapport</span>
+                </button>
+            </div>
+        </header>
+
+        <main>
+            <section>
+                <h2>Indication & Conditions Techniques</h2>
+                <p><strong>Indication :</strong> <span contenteditable="true" id="indication-text">Bilan de dyspnée d'effort. Recherche d'une cardiopathie sous-jacente.</span></p>
+                <p><strong>Conditions Techniques :</strong> <span contenteditable="true" id="conditions-text">Examen réalisé en décubitus latéral gauche. Bonne échogénicité. FC : </span><span contenteditable="true" id="conditions-fc">72</span><span contenteditable="true" id="conditions-text2"> bpm, rythme sinusal. SC : </span><span contenteditable="true" id="conditions-sc">1.87</span><span contenteditable="true" id="conditions-text3"> m².</span></p>
+            </section>
+            
+            <section>
+                <h2>Mesures et Analyse</h2>
+                <div class="info-box">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 7.5a.75.75 0 00-1.5 0v4.5a.75.75 0 001.5 0v-4.5zM12 15a.75.75 0 000 1.5h.008a.75.75 0 000-1.5H12z" /></svg>
+                    <span>Vous pouvez cliquer sur les valeurs et textes pour les modifier. Vos changements sont sauvegardés automatiquement.</span>
+                </div>
+                
+                <h3>Ventricule Gauche (VG)</h3>
+                <table class="measure-table">
+                    <thead><tr><th>Paramètre</th><th>Valeur</th><th>Normales</th></tr></thead>
+                    <tbody>
+                        <tr><td>Diamètre télédiastolique (DTDVG)</td><td><span contenteditable="true" id="val-dtdvg">49</span> mm</td><td>< 56</td></tr>
+                        <tr><td>Épaisseur septale diastolique (SIVd)</td><td><span contenteditable="true" id="val-sivd">12</span> mm</td><td>< 11</td></tr>
+                        <tr><td>Épaisseur paroi post. diast. (PPd)</td><td><span contenteditable="true" id="val-ppd">11</span> mm</td><td>< 11</td></tr>
+                        <tr><td>Masse VG indexée</td><td><span contenteditable="true" id="val-massevg">115</span> g/m²</td><td>< 95 F / < 115 H</td></tr>
+                        <tr><td>Fraction d'Éjection (FEVG) Simpson Biplan</td><td><span contenteditable="true" id="val-fevg">60</span> %</td><td>> 52 %</td></tr>
+                        <tr><td>Strain Longitudinal Global (SLG)</td><td><span contenteditable="true" id="val-slg">-19.5</span> %</td><td>< -18 %</td></tr>
+                    </tbody>
+                </table>
+                <h3>Cinétique Pariétale Segmentaire</h3>
+                <p><span contenteditable="true" id="val-cinetique">Cinétique segmentaire et globale homogène. Absence d'anomalie de la contraction segmentaire.</span></p>
+
+                <h3>Fonction Diastolique du VG</h3>
+                <table class="measure-table">
+                    <thead><tr><th>Paramètre</th><th>Valeur</th><th>Normales</th></tr></thead>
+                    <tbody>
+                        <tr><td>Flux mitral E/A</td><td><span contenteditable="true" id="val-ea">0.82</span></td><td>0.8 - 2.0</td></tr>
+                        <tr><td>Temps de décélération de l'onde E (TD)</td><td><span contenteditable="true" id="val-td">210</span> ms</td><td>160-240</td></tr>
+                        <tr><td>Doppler Tissulaire (e' septal / latéral)</td><td><span contenteditable="true" id="val-e-septal">7</span> / <span contenteditable="true" id="val-e-lateral">10</span> cm/s</td><td>>7 / >10</td></tr>
+                        <tr><td>Rapport E/e' moyen</td><td><span contenteditable="true" id="val-ee">8.2</span></td><td>< 14</td></tr>
+                    </tbody>
+                </table>
+
+                <h3>Ventricule Droit (VD) et Pressions Pulmonaires</h3>
+                <table class="measure-table">
+                     <thead><tr><th>Paramètre</th><th>Valeur</th><th>Normales</th></tr></thead>
+                     <tbody>
+                        <tr><td>Diamètre basal VD</td><td><span contenteditable="true" id="val-vd-diam">35</span> mm</td><td>< 41</td></tr>
+                        <tr><td>TAPSE</td><td><span contenteditable="true" id="val-tapse">23</span> mm</td><td>> 17</td></tr>
+                        <tr><td>Onde S' (anneau tricuspide)</td><td><span contenteditable="true" id="val-s-prime">13</span> cm/s</td><td>> 9.5</td></tr>
+                        <tr><td>Pression Artérielle Pulmonaire Syst. (PAPS) estimée</td><td><span contenteditable="true" id="val-paps">32</span> mmHg</td><td>< 35</td></tr>
+                    </tbody>
+                </table>
+                
+                <h3>Oreillettes</h3>
+                <table class="measure-table">
+                    <thead><tr><th>Paramètre</th><th>Valeur</th><th>Normales</th></tr></thead>
+                    <tbody>
+                        <tr><td>Volume Oreillette Gauche indexé</td><td><span contenteditable="true" id="val-og-vol">36</span> ml/m²</td><td>< 34</td></tr>
+                        <tr><td>Surface Oreillette Droite</td><td><span contenteditable="true" id="val-od-surf">16</span> cm²</td><td>< 18</td></tr>
+                    </tbody>
+                </table>
+
+                <h3>Valves</h3>
+                 <ul class="interpretation-list">
+                    <li><strong>Valve Aortique :</strong> <span contenteditable="true" id="text-valve-ao">tricuspide, sclérosée, sans sténose hémodynamiquement significative. Absence de fuite significative.</span></li>
+                    <li><strong>Valve Mitrale :</strong> <span contenteditable="true" id="text-valve-mi">appareil mitral souple, sans prolapsus. Insuffisance mitrale minime (grade I/IV).</span></li>
+                    <li><strong>Valve Tricuspide :</strong> <span contenteditable="true" id="text-valve-tr">fine, permettant une fuite minime servant au calcul des pressions.</span></li>
+                    <li><strong>Valve Pulmonaire :</strong> <span contenteditable="true" id="text-valve-pu">sans particularité.</span></li>
+                </ul>
+
+                <h3>Aorte et Péricarde</h3>
+                 <ul class="interpretation-list">
+                    <li><strong>Aorte :</strong> <span contenteditable="true" id="text-aorte">Anneau à 24mm, Sinus de Valsalva à 33mm, Aorte ascendante proximale à 34mm. Non dilatée.</span></li>
+                    <li><strong>Péricarde :</strong> <span contenteditable="true" id="text-pericarde">Absence d'épanchement péricardique significatif.</span></li>
+                </ul>
+            </section>
+            
+            <section id="conclusion-section">
+                <h2>Conclusion</h2>
+                <p id="conclusion-text" contenteditable="true">Échocardiographie de bonne qualité technique montrant :<br>- Fonction systolique biventriculaire conservée.<br>- Hypertrophie ventriculaire gauche concentrique légère.<br>- Dysfonction diastolique de grade I (trouble de la relaxation) avec dilatation légère de l'oreillette gauche, sans élévation des pressions de remplissage au repos.<br>- Sclérose valvulaire aortique non sténosante.<br>- Absence d'hypertension artérielle pulmonaire.<br>- Absence d'autre anomalie significative.</p>
+            </section>
+        </main>
+        
+        <footer>
+            Généré le <span id="generation-date"></span>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggleButton = document.getElementById('theme-toggle');
+            const printButton = document.getElementById('print-button');
+            const copyButton = document.getElementById('copy-button');
+            const copyButtonText = document.getElementById('copy-button-text');
+            const sunIcon = document.getElementById('theme-icon-sun');
+            const moonIcon = document.getElementById('theme-icon-moon');
+
+            // --- Gestion du thème (clair/sombre) ---
+            const applyTheme = (theme) => {
+                document.body.classList.toggle('dark-mode', theme === 'dark');
+                sunIcon.style.display = theme === 'dark' ? 'block' : 'none';
+                moonIcon.style.display = theme === 'dark' ? 'none' : 'block';
+            };
+            
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            applyTheme(savedTheme);
+
+            themeToggleButton.addEventListener('click', () => {
+                const newTheme = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+                localStorage.setItem('theme', newTheme);
+                applyTheme(newTheme);
+            });
+
+            // --- Bouton Imprimer ---
+            printButton.addEventListener('click', () => window.print());
+
+            // --- Fonction pour générer le rapport textuel complet ---
+            function generateFullReportText() {
+                const get = id => document.getElementById(id).innerText.trim();
+                const getHTML = id => document.getElementById(id).innerHTML.replace(/<br\s*\/?>/gi, '\n').trim();
+
+                const reportLines = [
+                    "COMPTE-RENDU D'ÉCHOCARDIOGRAPHIE TRANSTHORACIQUE (ETT)",
+                    "------------------------------------------------------------------",
+                    `PATIENT: ${get('patient-name')}`,
+                    `DATE DE NAISSANCE: ${get('patient-dob')}`,
+                    `DATE DE L'EXAMEN: ${get('exam-date')}`,
+                    `MÉDECIN PRESCRIPTEUR: ${get('prescribing-md')}`,
+                    "\nINDICATION:",
+                    get('indication-text'),
+                    "\nCONDITIONS TECHNIQUES:",
+                    `${get('conditions-text')} ${get('conditions-fc')} ${get('conditions-text2')} ${get('conditions-sc')} ${get('conditions-text3')}`,
+                    "\n======================== MESURES ========================",
+                    "\nVENTRICULE GAUCHE (VG)",
+                    `- Diamètre télédiastolique (DTDVG): ${get('val-dtdvg')} mm`,
+                    `- Épaisseur septale diastolique (SIVd): ${get('val-sivd')} mm`,
+                    `- Épaisseur paroi post. diast. (PPd): ${get('val-ppd')} mm`,
+                    `- Masse VG indexée: ${get('val-massevg')} g/m²`,
+                    `- Fraction d'Éjection (FEVG) Simpson Biplan: ${get('val-fevg')} %`,
+                    `- Strain Longitudinal Global (SLG): ${get('val-slg')} %`,
+                    "\nCINETIQUE PARIETALE SEGMENTAIRE",
+                    get('val-cinetique'),
+                    "\nFONCTION DIASTOLIQUE DU VG",
+                    `- Flux mitral E/A: ${get('val-ea')}`,
+                    `- Temps de décélération de l'onde E (TD): ${get('val-td')} ms`,
+                    `- Doppler Tissulaire (e' septal / latéral): ${get('val-e-septal')} / ${get('val-e-lateral')} cm/s`,
+                    `- Rapport E/e' moyen: ${get('val-ee')}`,
+                    "\nVENTRICULE DROIT (VD) ET PRESSIONS PULMONAIRES",
+                    `- Diamètre basal VD: ${get('val-vd-diam')} mm`,
+                    `- TAPSE: ${get('val-tapse')} mm`,
+                    `- Onde S' (anneau tricuspide): ${get('val-s-prime')} cm/s`,
+                    `- PAPS estimée: ${get('val-paps')} mmHg`,
+                    "\nOREILLETTES",
+                    `- Volume Oreillette Gauche indexé: ${get('val-og-vol')} ml/m²`,
+                    `- Surface Oreillette Droite: ${get('val-od-surf')} cm²`,
+                    "\nVALVES",
+                    `- Valve Aortique: ${get('text-valve-ao')}`,
+                    `- Valve Mitrale: ${get('text-valve-mi')}`,
+                    `- Valve Tricuspide: ${get('text-valve-tr')}`,
+                    `- Valve Pulmonaire: ${get('text-valve-pu')}`,
+                    "\nAORTE ET PERICARDE",
+                    `- Aorte: ${get('text-aorte')}`,
+                    `- Péricarde: ${get('text-pericarde')}`,
+                    "\n------------------------------------------------------------------",
+                    "                           CONCLUSION",
+                    "------------------------------------------------------------------",
+                    getHTML('conclusion-text')
+                ];
+
+                return reportLines.join('\n');
+            }
+
+            // --- Bouton Copier Rapport Complet ---
+            copyButton.addEventListener('click', () => {
+                const fullReportText = generateFullReportText();
+                navigator.clipboard.writeText(fullReportText).then(() => {
+                    copyButtonText.textContent = 'Copié !';
+                    copyButton.style.borderColor = '#28a745';
+                    setTimeout(() => {
+                        copyButtonText.textContent = 'Copier Rapport';
+                        copyButton.style.borderColor = '';
+                    }, 2000);
+                }).catch(err => console.error('Erreur de copie:', err));
+            });
+            
+            // --- Sauvegarde et chargement des valeurs éditables ---
+            const editableElements = document.querySelectorAll('[contenteditable="true"]');
+            editableElements.forEach(element => {
+                const savedValue = localStorage.getItem(element.id);
+                if (savedValue !== null) {
+                    element.innerHTML = savedValue;
+                }
+                element.addEventListener('blur', () => {
+                    localStorage.setItem(element.id, element.innerHTML);
+                });
+                element.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey && !element.id.includes('text')) {
+                        e.preventDefault();
+                        element.blur();
+                    }
+                });
+            });
+
+            // --- Date de génération ---
+            document.getElementById('generation-date').textContent = new Date().toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
+        });
+    </script>
+
+</body>
+</html>
