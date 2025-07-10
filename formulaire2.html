@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Feedback LifeVest</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:'Poppins',sans-serif;background:#F4F7F6;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;}
+    .container{background:#FFFFFF;padding:30px 40px;border-radius:16px;box-shadow:0 4px 12px rgba(0,0,0,0.1);max-width:650px;width:100%;animation:fadeInUp .6s ease;}
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+    h1{text-align:center;color:#0A2540;margin-top:0;margin-bottom:10px;}
+    #progress{height:8px;background:#e0e0e0;border-radius:4px;margin-bottom:25px;overflow:hidden;}
+    #progress-bar{height:100%;width:25%;background:linear-gradient(135deg,#007BFF,#0056b3);transition:width .3s;}
+    fieldset{border:none;padding:0;margin:0;}
+    .step{display:none;}
+    .step.active{display:block;}
+    .question{margin-bottom:22px;}
+    .question p{margin:0 0 8px;font-weight:600;color:#0A2540;}
+    .question small{font-weight:400;color:#555;}
+    input[type="range"]{width:100%;}
+    textarea{width:100%;min-height:80px;padding:10px;border:1px solid #ccc;border-radius:8px;font-family:'Poppins',sans-serif;resize:vertical;}
+    label{font-weight:500;color:#0A2540;margin-right:12px;cursor:pointer;}
+    .rating{direction:rtl;unicode-bidi:bidi-override;display:inline-flex;}
+    .rating>input{display:none;}
+    .rating>label{font-size:1.8rem;color:#ccc;transition:color .2s;}
+    .rating>input:checked~label,
+    .rating>label:hover,
+    .rating>label:hover~label{color:#FFD700;}
+    .buttons{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:25px;}
+    button{flex:1 1 120px;padding:12px 20px;border:none;border-radius:28px;color:#fff;background:linear-gradient(135deg,#007BFF,#0056b3);font-size:1rem;cursor:pointer;transition:transform .2s;}
+    button[disabled]{opacity:.5;cursor:not-allowed;}
+    button:hover:not([disabled]){transform:translateY(-2px);}
+    #thankyou{display:none;text-align:center;}
+    #thankyou h2{color:#0A2540;margin-bottom:8px;animation:fadeIn 1s;}
+    #thankyou p{color:#0A2540;font-weight:500;animation:fadeIn 1.2s;}
+    .hidden{display:none;}
+    @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+    @media(max-width:480px){
+      .container{padding:20px;}
+      button{flex:1 1 100%;}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Votre avis sur le LifeVest</h1>
+    <div id="progress"><div id="progress-bar"></div></div>
+
+    <form id="feedback-form">
+
+      <!-- Étape 1 : Prise en Main & Formation -->
+      <fieldset class="step active" data-step="0">
+        <legend class="hidden">Prise en Main &amp; Formation</legend>
+
+        <div class="question" data-question="Comment évalueriez-vous la clarté des instructions fournies ?">
+          <p>Comment évalueriez-vous la clarté des instructions fournies ?</p>
+          <div class="rating">
+            <input id="q1-5" type="radio" name="q1" value="5"><label for="q1-5">★</label>
+            <input id="q1-4" type="radio" name="q1" value="4"><label for="q1-4">★</label>
+            <input id="q1-3" type="radio" name="q1" value="3"><label for="q1-3">★</label>
+            <input id="q1-2" type="radio" name="q1" value="2"><label for="q1-2">★</label>
+            <input id="q1-1" type="radio" name="q1" value="1"><label for="q1-1">★</label>
+          </div>
+        </div>
+
+        <div class="question" data-question="Le temps nécessaire pour apprendre à utiliser le gilet vous a-t-il semblé adéquat ? (1 = Très court, 10 = Très long)">
+          <p>Le temps nécessaire pour apprendre à utiliser le gilet vous a-t-il semblé adéquat ? <small>(1 = Très court, 10 = Très long)</small></p>
+          <input type="range" name="q2" min="1" max="10" value="5" oninput="this.nextElementSibling.textContent=this.value">
+          <span>5</span>
+        </div>
+
+        <div class="question" data-question="Avez-vous eu besoin d'aide supplémentaire après la formation ?">
+          <p>Avez-vous eu besoin d'aide supplémentaire après la formation ?</p>
+          <label><input type="radio" name="q3" value="Oui"> Oui</label>
+          <label><input type="radio" name="q3" value="Non"> Non</label>
+        </div>
+
+        <div class="question" data-question="Comment décririez-vous la disponibilité du personnel formateur ?">
+          <p>Comment décririez-vous la disponibilité du personnel formateur ?</p>
+          <div class="rating">
+            <input id="q4-5" type="radio" name="q4" value="5"><label for="q4-5">★</label>
+            <input id="q4-4" type="radio" name="q4" value="4"><label for="q4-4">★</label>
+            <input id="q4-3" type="radio" name="q4" value="3"><label for="q4-3">★</label>
+            <input id="q4-2" type="radio" name="q4" value="2"><label for="q4-2">★</label>
+            <input id="q4-1" type="radio" name="q4" value="1"><label for="q4-1">★</label>
+          </div>
+        </div>
+
+        <div class="question" data-question="Notez globalement la phase de prise en main et de formation">
+          <p>Notez globalement la phase de prise en main et de formation</p>
+          <div class="rating">
+            <input id="q5-5" type="radio" name="q5" value="5"><label for="q5-5">★</label>
+            <input id="q5-4" type="radio" name="q5" value="4"><label for="q5-4">★</label>
+            <input id="q5-3" type="radio" name="q5" value="3"><label for="q5-3">★</label>
+            <input id="q5-2" type="radio" name="q5" value="2"><label for="q5-2">★</label>
+            <input id="q5-1" type="radio" name="q5" value="1"><label for="q5-1">★</label>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- Étape 2 : Confort & Utilisation Quotidienne -->
+      <fieldset class="step" data-step="1">
+        <legend class="hidden">Confort &amp; Utilisation Quotidienne</legend>
+
+        <div class="question" data-question="Notez le confort du gilet pendant la journée">
+          <p>Notez le confort du gilet pendant la journée</p>
+          <div class="rating">
+            <input id="q6-5" type="radio" name="q6" value="5"><label for="q6-5">★</label>
+            <input id="q6-4" type="radio" name="q6" value="4"><label for="q6-4">★</label>
+            <input id="q6-3" type="radio" name="q6" value="3"><label for="q6-3">★</label>
+            <input id="q6-2" type="radio" name="q6" value="2"><label for="q6-2">★</label>
+            <input id="q6-1" type="radio" name="q6" value="1"><label for="q6-1">★</label>
+          </div>
+        </div>
+
+        <div class="question" data-question="Combien d'heures par jour portez-vous le gilet en moyenne ? (0-24 h)">
+          <p>Combien d'heures par jour portez-vous le gilet en moyenne ? (0-24 h)</p>
+          <input type="range" name="q7" min="0" max="24" value="12" oninput="this.nextElementSibling.textContent=this.value+' h'">
+          <span>12 h</span>
+        </div>
+
+        <div class="question" data-question="Quel type de gêne avez-vous ressentie ?">
+          <p>Quel type de gêne avez-vous ressentie ? (plusieurs choix possibles)</p>
+          <label><input type="checkbox" name="q8" value="Frottements"> Frottements</label><br>
+          <label><input type="checkbox" name="q8" value="Poids"> Poids</label><br>
+          <label><input type="checkbox" name="q8" value="Chaleur"> Chaleur</label><br>
+          <label><input type="checkbox" name="q8" value="Mouvements limités"> Mouvements limités</label><br>
+          <label><input type="checkbox" name="q8" value="Aucune"> Aucune</label>
+        </div>
+
+        <div class="question" data-question="Évaluez la facilité d'entretien (lavage, recharge)">
+          <p>Évaluez la facilité d'entretien (lavage, recharge)</p>
+          <div class="rating">
+            <input id="q9-5" type="radio" name="q9" value="5"><label for="q9-5">★</label>
+            <input id="q9-4" type="radio" name="q9" value="4"><label for="q9-4">★</label>
+            <input id="q9-3" type="radio" name="q9" value="3"><label for="q9-3">★</label>
+            <input id="q9-2" type="radio" name="q9" value="2"><label for="q9-2">★</label>
+            <input id="q9-1" type="radio" name="q9" value="1"><label for="q9-1">★</label>
+          </div>
+        </div>
+
+        <div class="question" data-question="Notez globalement l'utilisation quotidienne">
+          <p>Notez globalement l'utilisation quotidienne</p>
+          <div class="rating">
+            <input id="q10-5" type="radio" name="q10" value="5"><label for="q10-5">★</label>
+            <input id="q10-4" type="radio" name="q10" value="4"><label for="q10-4">★</label>
+            <input id="q10-3" type="radio" name="q10" value="3"><label for="q10-3">★</label>
+            <input id="q10-2" type="radio" name="q10" value="2"><label for="q10-2">★</label>
+            <input id="q10-1" type="radio" name="q10" value="1"><label for="q10-1">★</label>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- Étape 3 : Impact Émotionnel & Sécurité -->
+      <fieldset class="step" data-step="2">
+        <legend class="hidden">Impact Émotionnel &amp; Sécurité</legend>
+
+        <div class="question" data-question="Le gilet vous apporte-t-il un sentiment de sécurité ? (1 = Pas du tout, 10 = Absolument)">
+          <p>Le gilet vous apporte-t-il un sentiment de sécurité ? <small>(1 = Pas du tout, 10 = Absolument)</small></p>
+          <input type="range" name="q11" min="1" max="10" value="5" oninput="this.nextElementSibling.textContent=this.value">
+          <span>5</span>
+        </div>
+
+        <div class="question" data-question="Votre anxiété liée à votre santé a-t-elle diminué grâce au gilet ?">
+          <p>Votre anxiété liée à votre santé a-t-elle diminué grâce au gilet ?</p>
+          <label><input type="radio" name="q12" value="Oui"> Oui</label>
+          <label><input type="radio" name="q12" value="Non"> Non</label>
+          <label><input type="radio" name="q12" value="Je ne sais pas"> Je ne sais pas</label>
+        </div>
+
+        <div class="question" data-question="Comment vous sentez-vous en portant le gilet en public ?">
+          <p>Comment vous sentez-vous en portant le gilet en public ?</p>
+          <div class="rating">
+            <input id="q13-5" type="radio" name="q13" value="Très à l'aise"><label for="q13-5">★</label>
+            <input id="q13-4" type="radio" name="q13" value="Plutôt à l'aise"><label for="q13-4">★</label>
+            <input id="q13-3" type="radio" name="q13" value="Neutre"><label for="q13-3">★</label>
+            <input id="q13-2" type="radio" name="q13" value="Un peu mal à l'aise"><label for="q13-2">★</label>
+            <input id="q13-1" type="radio" name="q13" value="Très mal à l'aise"><label for="q13-1">★</label>
+          </div>
+        </div>
+
+        <div class="question" data-question="Seriez-vous prêt·e à recommander le gilet à d'autres patients ?">
+          <p>Seriez-vous prêt·e à recommander le gilet à d'autres patients ?</p>
+          <label><input type="radio" name="q14" value="Oui"> Oui</label>
+          <label><input type="radio" name="q14" value="Non"> Non</label>
+        </div>
+
+        <div class="question" data-question="Notez globalement l'impact émotionnel">
+          <p>Notez globalement l'impact émotionnel</p>
+          <div class="rating">
+            <input id="q15-5" type="radio" name="q15" value="5"><label for="q15-5">★</label>
+            <input id="q15-4" type="radio" name="q15" value="4"><label for="q15-4">★</label>
+            <input id="q15-3" type="radio" name="q15" value="3"><label for="q15-3">★</label>
+            <input id="q15-2" type="radio" name="q15" value="2"><label for="q15-2">★</label>
+            <input id="q15-1" type="radio" name="q15" value="1"><label for="q15-1">★</label>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- Étape 4 : Suggestions d'Amélioration -->
+      <fieldset class="step" data-step="3">
+        <legend class="hidden">Suggestions d'Amélioration</legend>
+
+        <div class="question" data-question="Quelles fonctionnalités aimeriez-vous voir ajoutées ?">
+          <p>Quelles fonctionnalités aimeriez-vous voir ajoutées ?</p>
+          <textarea name="q16" placeholder="Vos idées..."></textarea>
+        </div>
+
+        <div class="question" data-question="Comment pourrions-nous améliorer le confort ?">
+          <p>Comment pourrions-nous améliorer le confort ?</p>
+          <textarea name="q17" placeholder="Vos suggestions..."></textarea>
+        </div>
+
+        <div class="question" data-question="Souhaitez-vous être recontacté·e pour des mises à jour ou des études ?">
+          <p>Souhaitez-vous être recontacté·e pour des mises à jour ou des études ?</p>
+          <label><input type="radio" name="q18" value="Oui" onclick="document.getElementById('email-field').style.display='block'"> Oui</label>
+          <label><input type="radio" name="q18" value="Non" onclick="document.getElementById('email-field').style.display='none'"> Non</label>
+        </div>
+
+        <div class="question" id="email-field" data-question="Adresse e-mail pour le suivi" style="display:none;">
+          <p>Adresse e-mail pour le suivi</p>
+          <input type="email" name="q19" placeholder="votre.email@example.com">
+        </div>
+
+        <div class="question" data-question="Autres commentaires">
+          <p>Autres commentaires</p>
+          <textarea name="q20" placeholder="Votre message..."></textarea>
+        </div>
+      </fieldset>
+
+      <div class="buttons">
+        <button type="button" id="prev">Précédent</button>
+        <button type="button" id="next">Suivant</button>
+        <button type="button" id="submit" style="display:none;">Soumettre mon avis</button>
+      </div>
+    </form>
+  </div>
+
+  <div id="thankyou">
+    <h2>Merci pour votre retour !</h2>
+    <p>Vos réponses ont été enregistrées et téléchargées avec succès.</p>
+  </div>
+
+  <script>
+    const form = document.getElementById('feedback-form');
+    const steps = document.querySelectorAll('.step');
+    const nextBtn = document.getElementById('next');
+    const prevBtn = document.getElementById('prev');
+    const submitBtn = document.getElementById('submit');
+    const progressBar = document.getElementById('progress-bar');
+    let currentStep = 0;
+
+    function showStep(n){
+      steps.forEach((step,i)=>step.classList.toggle('active',i===n));
+      prevBtn.style.display = n===0?'none':'inline-block';
+      nextBtn.style.display = n===steps.length-1?'none':'inline-block';
+      submitBtn.style.display = n===steps.length-1?'inline-block':'none';
+      progressBar.style.width = ((n+1)/steps.length*100)+'%';
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    nextBtn.addEventListener('click',()=>{
+      if(currentStep<steps.length-1){
+        currentStep++;
+        showStep(currentStep);
+      }
+    });
+
+    prevBtn.addEventListener('click',()=>{
+      if(currentStep>0){
+        currentStep--;
+        showStep(currentStep);
+      }
+    });
+
+    submitBtn.addEventListener('click',()=>{
+      const exportText = gatherResponses();
+      const blob = new Blob([exportText], {type:'text/plain'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Feedback_LifeVest.txt';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      document.querySelector('.container').style.display='none';
+      document.getElementById('thankyou').style.display='block';
+    });
+
+    function gatherResponses(){
+      const questions = document.querySelectorAll('.question');
+      const lines = [`Date et heure de soumission : ${new Date().toLocaleString('fr-FR')}`, ''];
+      let num = 1;
+      questions.forEach(q=>{
+        const qText = q.dataset.question || `Question ${num}`;
+        let answer = 'Non répondu';
+        const inputs = q.querySelectorAll('input, textarea');
+        if(inputs.length){
+          const firstType = inputs[0].type || inputs[0].tagName.toLowerCase();
+          if(firstType==='radio'){
+            const checked = q.querySelector('input:checked');
+            if(checked) answer = checked.value;
+          }else if(firstType==='checkbox'){
+            const checked = q.querySelectorAll('input:checked');
+            if(checked.length) answer = Array.from(checked).map(c=>c.value).join(', ');
+          }else if(firstType==='range'){
+            answer = inputs[0].value;
+          }else{
+            answer = inputs[0].value.trim()||'Non répondu';
+          }
+        }
+        lines.push(`Question ${num}: ${qText}`);
+        lines.push(`Réponse: ${answer}`, '');
+        num++;
+      });
+      return lines.join('\n');
+    }
+
+    showStep(currentStep);
+  </script>
+</body>
+</html>
