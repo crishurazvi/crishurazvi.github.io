@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Compte Rendu d'Échographie Cardiaque</title>
+    <style>
+        :root {
+            --primary-color: #005a9e;
+            --secondary-color: #f0f8ff;
+            --border-color: #ccc;
+            --text-color: #333;
+            --label-color: #555;
+            --bg-color: #ffffff;
+            --header-bg: #f8f9fa;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--bg-color);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        header h1 {
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        fieldset {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #fdfdfd;
+        }
+
+        legend {
+            font-weight: bold;
+            color: var(--primary-color);
+            padding: 0 10px;
+            font-size: 1.1em;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        label {
+            font-weight: 500;
+            color: var(--label-color);
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .checkbox-group label {
+            font-weight: normal;
+            margin-bottom: 0;
+        }
+
+        .unit {
+            margin-left: -35px;
+            color: #888;
+            padding-right: 10px;
+        }
+        
+        .input-with-unit {
+            display: flex;
+            align-items: center;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            margin: 0 10px;
+        }
+
+        button:hover {
+            background-color: #004175;
+            transform: translateY(-2px);
+        }
+        
+        #btn-copy {
+            background-color: #28a745;
+        }
+        
+        #btn-copy:hover {
+            background-color: #218838;
+        }
+
+        #compteRenduOutput {
+            width: 100%;
+            height: 350px;
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 0.95rem;
+            white-space: pre-wrap;
+            background-color: var(--header-bg);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Générateur de Compte Rendu d'Échographie Cardiaque</h1>
+        </header>
+
+        <form id="echoForm">
+            <div class="form-grid">
+                <fieldset>
+                    <legend>Informations Générales</legend>
+                    <div class="input-group">
+                        <label for="patientName">Nom du Patient :</label>
+                        <input type="text" id="patientName" name="patientName" placeholder="ex: Jean Dupont">
+                    </div>
+                    <div class="input-group">
+                        <label for="examDate">Date de l'examen :</label>
+                        <input type="date" id="examDate" name="examDate">
+                    </div>
+                    <div class="input-group">
+                        <label for="echogenicite">Échogénicité :</label>
+                        <select id="echogenicite" name="echogenicite">
+                            <option value="adéquate en apical, médiocre en parasternal et sous-costal" selected>Médiocre en parasternal et sous-costal, adéquate en apical</option>
+                            <option value="adéquate">Adéquate</option>
+                            <option value="médiocre">Médiocre</option>
+                            <option value="difficile">Difficile</option>
+                            <option value="inéchogène">Inéchogène</option>
+                        </select>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Ventricule Gauche (VG)</legend>
+                    <div class="input-row">
+                        <select id="vgDilatation" style="flex: 1;">
+                            <option value="dilaté" selected>Dilaté</option>
+                            <option value="non dilaté">Non dilaté</option>
+                            <option value="sévèrement dilaté">Sévèrement dilaté</option>
+                        </select>
+                        <select id="vgHypertrophie" style="flex: 1;">
+                            <option value="hypertrophié" selected>Hypertrophié</option>
+                            <option value="non hypertrophié">Non hypertrophié</option>
+                            <option value="concentrique">Hypertrophie concentrique</option>
+                            <option value="excentrique">Hypertrophie excentrique</option>
+                        </select>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-with-unit"><input type="number" id="dtdvg" value="62"><span class="unit">mm</span></div>
+                        <div class="input-with-unit"><input type="number" id="vtdvgi" value="94"><span class="unit">ml/m²</span></div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-with-unit"><input type="number" id="sivd" value="10"><span class="unit">mm</span></div>
+                        <div class="input-with-unit"><input type="number" id="ppd" value="12"><span class="unit">mm</span></div>
+                        <div class="input-with-unit"><input type="number" id="mvgi" value="194"><span class="unit">g/m²</span></div>
+                    </div>
+                    <div class="input-group">
+                        <label>Fonction Systolique :</label>
+                         <select id="fonctionSystoliqueVG">
+                            <option value="altérée" selected>Altérée</option>
+                            <option value="conservée">Conservée</option>
+                             <option value="modérément altérée">Modérément altérée</option>
+                            <option value="sévèrement altérée">Sévèrement altérée</option>
+                        </select>
+                    </div>
+                    <div class="input-row">
+                        <label for="fevg">FEVG :</label>
+                        <div class="input-with-unit"><input type="number" id="fevg" value="33"><span class="unit">% SBP</span></div>
+                    </div>
+                     <div class="input-group">
+                        <label>Cinétique Segmentaire :</label>
+                        <input type="text" id="cinetiqueVG" value="Hypokinésie globale plus marquée en inférobasal, inféromédian, inféroseptobasal, inféroseptomédian">
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="asynchronisme" name="asynchronisme" checked>
+                        <label for="asynchronisme">Asynchronisme intraventriculaire</label>
+                    </div>
+                     <div class="checkbox-group">
+                        <input type="checkbox" id="slgNonRealisable" name="slgNonRealisable" checked>
+                        <label for="slgNonRealisable">SLG non réalisable par défaut d'électrodes</label>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Ventricule Droit (VD)</legend>
+                     <div class="input-row">
+                        <select id="vdDilatation" style="flex: 1;">
+                            <option value="non dilaté" selected>Non dilaté</option>
+                            <option value="dilaté">Dilaté</option>
+                        </select>
+                        <select id="vdHypertrophie" style="flex: 1;">
+                            <option value="non hypertrophié" selected>Non hypertrophié</option>
+                            <option value="hypertrophié">Hypertrophié</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Fonction Systolique :</label>
+                         <select id="fonctionSystoliqueVD">
+                            <option value="modérément altérée" selected>Modérément altérée</option>
+                            <option value="conservée">Conservée</option>
+                             <option value="altérée">Altérée</option>
+                            <option value="sévèrement altérée">Sévèrement altérée</option>
+                        </select>
+                    </div>
+                     <div class="input-row">
+                        <div class="input-with-unit"><label for="tapse">TAPSE:</label><input type="number" id="tapse" value="16"><span class="unit">mm</span></div>
+                        <div class="input-with-unit"><label for="svd">S'VD:</label><input type="number" id="svd" value="8"><span class="unit">cm/s</span></div>
+                    </div>
+                </fieldset>
+                
+                <fieldset>
+                    <legend>Oreillettes (OG & OD)</legend>
+                    <div class="input-group">
+                        <label>Oreillette Gauche :</label>
+                        <select id="ogDilatation">
+                            <option value="dilatée" selected>Dilatée</option>
+                            <option value="non dilatée">Non dilatée</option>
+                            <option value="sévèrement dilatée">Sévèrement dilatée</option>
+                        </select>
+                         <div class="input-with-unit"><input type="number" id="vtsogi" value="51"><span class="unit">ml/m²</span></div>
+                    </div>
+                     <div class="input-group">
+                        <label>Oreillette Droite :</label>
+                        <select id="odDilatation">
+                            <option value="non dilatée" selected>Non dilatée</option>
+                            <option value="dilatée">Dilatée</option>
+                        </select>
+                         <div class="input-with-unit"><input type="number" id="stsod" value="13"><span class="unit">cm²</span></div>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Valves et Structures</legend>
+                    <div class="input-group">
+                        <label for="aorteAsc">Aorte ascendante :</label>
+                        <select id="aorteAscDilatation">
+                            <option value="non dilatée" selected>Non dilatée</option>
+                            <option value="dilatée">Dilatée</option>
+                            <option value="anévrysmale">Anévrysmale</option>
+                        </select>
+                        <input type="text" id="aorteAscMesures" value="35/33/33 mm">
+                    </div>
+                     <div class="input-group">
+                        <label for="vci">Veine Cave Inférieure (VCI) :</label>
+                         <select id="vciEtat">
+                            <option value="dilatée non compliante" selected>Dilatée non compliante</option>
+                            <option value="fine et compliante">Fine et compliante</option>
+                            <option value="non dilatée">Non dilatée</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="pericarde">Péricarde :</label>
+                         <select id="pericarde">
+                            <option value="sec" selected>Sec</option>
+                            <option value="épanchement minime">Épanchement minime</option>
+                            <option value="épanchement modéré">Épanchement modéré</option>
+                            <option value="épanchement abondant">Épanchement abondant</option>
+                        </select>
+                    </div>
+                    <hr>
+                    <div class="input-group">
+                        <label>Valve Aortique :</label>
+                        <input type="text" id="valveAortique" value="Tricuspide, sans fuite ni sténose">
+                    </div>
+                     <div class="input-group">
+                        <label>Valve Mitrale :</label>
+                        <input type="text" id="valveMitrale" value="Fine, anneau sain, fuite fonctionnelle ventriculaire minime sans sténose">
+                    </div>
+                     <div class="input-group">
+                        <label>Valves Droites :</label>
+                        <input type="text" id="valvesDroites" value="Absence de valvulopathie tricuspide ou pulmonaire">
+                    </div>
+                </fieldset>
+                
+                <fieldset>
+                    <legend>Fonction Diastolique & Pressions</legend>
+                    <div class="input-group">
+                        <label>Profil mitral :</label>
+                         <select id="profilMitral">
+                            <option value="type E exclusive, pressions de remplissage élevées" selected>Type E exclusive, pressions de remplissage élevées</option>
+                            <option value="normal (grade 1)">Disfonction grade 1</option>
+                            <option value="pseudo-normal (grade 2)">Disfonction grade 2</option>
+                            <option value="restrictif (grade 3)">Disfonction grade 3</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Pressions Pulmonaires :</label>
+                        <input type="text" id="pressionsPulmonaires" value="IT non exploitable pour l'estimation des pressions pulmonaires. Arbre pulmonaire non dilaté.">
+                    </div>
+                     <div class="input-group">
+                        <label>Débit Cardiaque :</label>
+                         <select id="debitCardiaque">
+                             <option value="altéré" selected>Altéré</option>
+                             <option value="conservé">Conservé</option>
+                             <option value="augmenté">Augmenté</option>
+                         </select>
+                         <div class="input-with-unit"><input type="number" id="ic" value="1.95"><span class="unit">L/min/m²</span></div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <div class="button-container">
+                <button type="button" id="btn-generate">Générer le Compte Rendu</button>
+                <button type="button" id="btn-copy">Copier le Résumé</button>
+		<button type="button" id="btn-share-link" style="background-color: #ff8c00;">Generează Link Partajabil</button>
+            </div>
+
+            <textarea id="compteRenduOutput" readonly placeholder="Le compte rendu généré apparaîtra ici..."></textarea>
+		<div id="share-link-container" style="text-align: center; margin-top: 20px; font-size: 1.2em; font-weight: bold;"></div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('btn-generate').addEventListener('click', generateReport);
+        document.getElementById('btn-copy').addEventListener('click', copyReport);
+	document.getElementById('btn-share-link').addEventListener('click', shareViaLink);
+
+
+	let generatedReportText = ""; 
+
+        // Auto-set today's date
+        document.getElementById('examDate').valueAsDate = new Date();
+
+        function getValue(id) {
+            return document.getElementById(id).value;
+        }
+        
+        function isChecked(id) {
+            return document.getElementById(id).checked;
+        }
+
+        function generateReport() {
+            let report = "COMPTE RENDU D'ÉCHOGRAPHIE CARDIAQUE TRANS-THORACIQUE\n";
+            report += "=========================================================\n\n";
+
+            // Patient and Exam Info
+            const patientName = getValue('patientName');
+            if(patientName) {
+                report += `Patient: ${patientName}\n`;
+            }
+            const examDate = new Date(getValue('examDate')).toLocaleDateString('fr-FR');
+            if(examDate) {
+                report += `Date de l'examen: ${examDate}\n\n`;
+            }
+
+            report += `Échogénicité ${getValue('echogenicite')}.\n\n`;
+
+            // Ventricule Gauche
+            let vgText = `Ventricule gauche ${getValue('vgDilatation')} (DTDVG ${getValue('dtdvg')} mm, VTDVGi ${getValue('vtdvgi')} ml/m²), ${getValue('vgHypertrophie')} (SIVd ${getValue('sivd')} mm, PPd ${getValue('ppd')} mm, MVGi ${getValue('mvgi')} g/m²), de fonction systolique ${getValue('fonctionSystoliqueVG')} avec FEVG ${getValue('fevg')} % SBP`;
+
+            const cinetiqueVG = getValue('cinetiqueVG');
+            if (cinetiqueVG) {
+                vgText += `, ${cinetiqueVG}`;
+            }
+            
+            if (isChecked('asynchronisme')) {
+                vgText += ", asynchronisme intraventriculaire";
+            }
+            
+            vgText += ".";
+            
+            if (isChecked('slgNonRealisable')) {
+                vgText += " SLG non réalisable par défaut d'électrodes.";
+            }
+            report += vgText + "\n\n";
+            
+            // Ventricule Droit
+            report += `Ventricule droit ${getValue('vdDilatation')}, ${getValue('vdHypertrophie')}, de fonction systolique ${getValue('fonctionSystoliqueVD')} (TAPSE ${getValue('tapse')} mm, S'VD ${getValue('svd')} cm/s).\n\n`;
+
+            // Oreillettes
+            report += `Oreillette gauche ${getValue('ogDilatation')} avec VTSOGi à ${getValue('vtsogi')} ml/m² et oreillette droite ${getValue('odDilatation')} avec STSOD à ${getValue('stsod')} cm².\n\n`;
+
+            // Structures
+            report += `Aorte ascendante ${getValue('aorteAscDilatation')} à ${getValue('aorteAscMesures')}.\n`;
+            report += `Veine cave inférieure ${getValue('vciEtat')}.\n`;
+            report += `Péricarde ${getValue('pericarde')}.\n\n`;
+            
+            // Valves
+            report += `Valve aortique ${getValue('valveAortique')}.\n`;
+            report += `Valve mitrale ${getValue('valveMitrale')}.\n`;
+            report += `${getValue('valvesDroites')}.\n\n`;
+            
+            // Diastolic and Pressures
+            report += `Profil mitral ${getValue('profilMitral')}.\n`;
+            report += `${getValue('pressionsPulmonaires')}\n`;
+            report += `Débit cardiaque ${getValue('debitCardiaque')} avec IC ${getValue('ic')} L/min/m².\n\n`;
+
+            // Conclusion Section
+            report += "CONCLUSION :\n";
+            report += "------------\n";
+            let conclusion = `- Cardiomyopathie dilatée à fonction systolique VG ${getValue('fonctionSystoliqueVG')} (FEVG ${getValue('fevg')} %).`;
+            if (cinetiqueVG) conclusion += ` ${cinetiqueVG}.`;
+            if (isChecked('asynchronisme')) conclusion += ` Asynchronisme intra-VG.`;
+            conclusion += `\n- Fonction systolique VD ${getValue('fonctionSystoliqueVD')}.`;
+            conclusion += `\n- Oreillette gauche ${getValue('ogDilatation')}.`;
+            conclusion += `\n- Pressions de remplissage VG élevées.`;
+            conclusion += `\n- ${getValue('pressionsPulmonaires')}`;
+            conclusion += `\n- Absence de valvulopathie significative.`;
+            
+            report += conclusion;
+		generatedReportText = report; // Salvăm textul generat în variabila globală
+		document.getElementById('compteRenduOutput').value = generatedReportText;
+
+
+            document.getElementById('compteRenduOutput').value = report;
+        }
+
+        function copyReport() {
+            const output = document.getElementById('compteRenduOutput');
+            const btn = document.getElementById('btn-copy');
+
+            if (output.value === "") {
+                alert("Veuillez d'abord générer le compte rendu !");
+                return;
+            }
+
+            output.select();
+            output.setSelectionRange(0, 99999); // For mobile devices
+
+            navigator.clipboard.writeText(output.value).then(() => {
+                const originalText = btn.textContent;
+                btn.textContent = 'Copié !';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Erreur lors de la copie : ', err);
+                alert("La copie a échoué. Veuillez essayer manuellement.");
+            });
+        }
+async function shareViaLink() {
+    const linkContainer = document.getElementById('share-link-container');
+    
+    if (generatedReportText.trim() === "") {
+        alert("Generează mai întâi raportul!");
+        return;
+    }
+
+    linkContainer.innerHTML = "Se generează link-ul, te rog așteaptă...";
+    linkContainer.style.color = "#333";
+
+    try {
+        // 1. Am schimbat URL-ul către API-ul pastes.dev
+        const response = await fetch('https://pastes.dev/api/v2/pastes', {
+            method: 'POST',
+            // 2. API-ul necesită un header care specifică formatul JSON
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            // 3. Trimitem datele în format JSON
+            body: JSON.stringify({
+                content: generatedReportText,
+                // Opțional: putem seta o dată de expirare
+                expires: "1w" // Expiră într-o săptămână
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Eroare de la server: ${response.statusText}`);
+        }
+        
+        // 4. Procesăm răspunsul JSON primit de la server
+        const result = await response.json();
+        
+        // 5. Construim URL-ul final folosind cheia primită
+        const shareUrl = `https://pastes.dev/${result.key}`;
+
+        // Afișăm link-ul generat ca un link click-abil
+        linkContainer.innerHTML = `Link generat (expiră în 7 zile): <a href="${shareUrl}" target="_blank">${shareUrl}</a>`;
+
+    } catch (error) {
+        console.error('Eroare la partajare:', error);
+        linkContainer.innerHTML = "Eroare la generarea link-ului. Te rog încearcă să copiezi textul manual.";
+        linkContainer.style.color = "red";
+    }
+}
+
+    </script>
+</body>
+</html>
