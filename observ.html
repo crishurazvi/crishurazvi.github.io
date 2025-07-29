@@ -3,142 +3,360 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Observations Simplifiées</title>
+    <title>Observations Médicales - Cardiologie</title>
     <style>
-        /* Folosim un font monospace pentru un aspect de editor text */
-        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400&display=swap');
+        /* --- General Styling --- */
+        :root {
+            --primary-bg-color: #f4f7f9;
+            --secondary-bg-color: #ffffff;
+            --text-color: #333;
+            --primary-color: #007bff;
+            --primary-hover-color: #0056b3;
+            --danger-color: #dc3545;
+            --danger-hover-color: #c82333;
+            --border-color: #e0e0e0;
+            --sidebar-bg: #f8f9fa;
+        }
 
         body {
-            font-family: 'Roboto Mono', monospace;
-            background-color: #f8f9fa;
-            color: #212529;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--primary-bg-color);
+            color: var(--text-color);
             margin: 0;
-            padding: 15px;
-            /* Font foarte mic, conform cerinței */
+            padding: 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* --- Layout --- */
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 25px;
+            overflow-y: auto;
+        }
+
+        .sidebar {
+            width: 280px;
+            flex-shrink: 0;
+            background-color: var(--sidebar-bg);
+            border-left: 1px solid var(--border-color);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Header --- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover-color);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: var(--danger-hover-color);
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        /* --- Patient Card --- */
+        .patient-card {
+            background-color: var(--secondary-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .patient-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: #fcfcfc;
+            border-bottom: 1px solid var(--border-color);
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+        
+        .patient-type {
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--primary-color);
+        }
+
+        .patient-actions .btn {
+            margin-left: 10px;
+            padding: 5px 10px;
             font-size: 12px;
         }
 
-        .controls {
-            padding-bottom: 15px;
-            border-bottom: 1px solid #dee2e6;
+        textarea.observation-text {
+            width: 100%;
+            height: 250px;
+            border: none;
+            padding: 15px;
+            font-family: 'Consolas', 'Menlo', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.7;
+            resize: vertical;
+            background-color: transparent;
+            color: var(--text-color);
+            box-sizing: border-box; /* Important for padding */
+        }
+        
+        textarea.observation-text:focus {
+            outline: none;
+        }
+
+        /* --- Sidebar Content --- */
+        .sidebar h2 {
+            font-size: 18px;
+            margin-top: 0;
             margin-bottom: 15px;
         }
 
-        #add-patient-btn {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            font-size: 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: 'Roboto Mono', monospace;
-        }
-        #add-patient-btn:hover {
-            background-color: #0056b3;
-        }
-
-        #patient-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .patient-block {
-            display: flex;
-            align-items: flex-start; /* Aliniere la început */
-            gap: 10px;
-        }
-
-        /* Căsuța pentru numărul camerei/patului */
-        .patient-id {
-            padding: 6px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            width: 50px; /* Lățime fixă */
-            text-align: center;
+        #bilan-notes {
+            flex-grow: 1;
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            resize: none;
+            font-family: inherit;
             font-size: 14px;
-            font-weight: bold;
-            margin-top: 1px;
+            box-sizing: border-box;
         }
-
-        /* Căsuța principală de text, care ocupă restul spațiului */
-        .observation-textarea {
-            flex-grow: 1; /* Ocupă spațiul rămas */
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            padding: 8px;
-            font-family: 'Roboto Mono', monospace;
-            font-size: 13px; /* Mărime specifică pentru textul principal */
-            line-height: 1.6; /* Spațiere mai mare între rânduri pentru lizibilitate */
-            resize: vertical; /* Permite redimensionare doar pe verticală */
-            min-height: 110px; /* Înălțime minimă */
-            outline: none;
-            background-color: #fff;
+        #bilan-notes:focus {
+            outline: 2px solid var(--primary-color);
+            border-color: var(--primary-color);
         }
-
-        .observation-textarea:focus {
-            border-color: #80bdff;
-            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
-        }
-
-        /* Butonul de ștergere */
-        .delete-btn {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 30px;
-            height: 30px;
-            font-size: 16px;
-            line-height: 30px;
+        
+        #patient-list:empty::before {
+            content: "Aucun patient à afficher. Cliquez sur 'Ajouter un nouveau patient' pour commencer.";
+            display: block;
             text-align: center;
-            flex-shrink: 0; /* Nu se micșorează */
+            color: #888;
+            font-style: italic;
+            padding: 50px;
+            font-size: 16px;
         }
-        .delete-btn:hover {
-            background-color: #c82333;
+
+        /* --- Modal for Patient Selection --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none; /* Initially hidden */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        
+        .modal-content h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .modal-content .btn {
+            margin: 0 10px;
+            width: 200px;
         }
 
     </style>
 </head>
 <body>
 
-    <div class="controls">
-        <button id="add-patient-btn">+ Adaugă Pacient</button>
+    <div class="container">
+        <main class="main-content">
+            <header class="header">
+                <h1>Observations Médicales du Jour</h1>
+                <button id="add-patient-btn" class="btn btn-primary">Ajouter un nouveau patient</button>
+            </header>
+            <div id="patient-list">
+                <!-- Patient cards will be dynamically inserted here -->
+            </div>
+        </main>
+
+        <aside class="sidebar">
+            <h2>Bilan Biologique pour demain</h2>
+            <textarea id="bilan-notes" placeholder="Écrivez ici les bilans à prévoir..."></textarea>
+        </aside>
     </div>
 
-    <div id="patient-list">
-        <!-- Pacienții vor fi adăugați aici de JavaScript -->
+    <!-- Modal for selecting patient type -->
+    <div id="patient-type-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Choisir le service</h3>
+            <button class="btn btn-secondary" onclick="addPatient('cardio')">Cardiologie Conventionnelle</button>
+            <button class="btn btn-primary" onclick="addPatient('usic')">USIC</button>
+        </div>
     </div>
 
-    <!-- Acesta este modelul (template) pentru un pacient nou. Este invizibil pe pagină. -->
-    <template id="patient-template">
-        <div class="patient-block">
-            <input type="text" class="patient-id" placeholder="Sală">
-            <!-- Conținutul de mai jos este pre-completat în fiecare căsuță nouă -->
-            <textarea class="observation-textarea">TA = mmHg, FC /m, Apyrétique; Saturation: % en AA
+    <script>
+        // --- Templates ---
+        const templates = {
+            usic: `TA =     mmHg, FC    /m, Apyrétique; Saturation:    % en AA
+C:
 
+Bio:
+ECG:
+Télémétrie:
+
+CAT:
+`,
+            cardio: `TA =     mmHg, FC    /m, Apyrétique; Saturation:    % en AA
 C:
 
 Bio:
 
-CAT:</textarea>
-            <!-- Butonul apelează direct ștergerea părintelui său (întregul rând) -->
-            <button class="delete-btn" onclick="this.parentElement.remove()">×</button>
-        </div>
-    </template>
+CAT:
+`
+        };
 
-    <script>
-        // Setează funcționalitatea butonului de adăugare
-        document.getElementById('add-patient-btn').addEventListener('click', () => {
-            const template = document.getElementById('patient-template');
-            // Creează o copie a modelului
-            const clone = template.content.cloneNode(true);
-            // Adaugă copia în lista de pe pagină
-            document.getElementById('patient-list').appendChild(clone);
+        // --- DOM Elements ---
+        const addPatientBtn = document.getElementById('add-patient-btn');
+        const patientList = document.getElementById('patient-list');
+        const modal = document.getElementById('patient-type-modal');
+        const bilanNotes = document.getElementById('bilan-notes');
+        
+        // --- Event Listeners ---
+        addPatientBtn.addEventListener('click', () => {
+            modal.style.display = 'flex';
         });
-    </script>
 
+        // Close modal if user clicks outside of the content area
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Event delegation for actions on patient cards
+        patientList.addEventListener('click', (e) => {
+            const target = e.target;
+            
+            // Copy button
+            if (target.classList.contains('copy-btn')) {
+                const card = target.closest('.patient-card');
+                const textarea = card.querySelector('.observation-text');
+                navigator.clipboard.writeText(textarea.value).then(() => {
+                    target.textContent = 'Copié!';
+                    setTimeout(() => { target.textContent = 'Copier'; }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                    alert("Erreur lors de la copie.");
+                });
+            }
+
+            // Delete button
+            if (target.classList.contains('delete-btn')) {
+                if (confirm('Êtes-vous sûr de vouloir supprimer cette observation ?')) {
+                    const card = target.closest('.patient-card');
+                    card.remove();
+                }
+            }
+        });
+        
+        // --- Sidebar Notes Persistence ---
+        // Load saved notes on page load
+        bilanNotes.value = localStorage.getItem('bilanNotes') || '';
+        
+        // Save notes on input
+        bilanNotes.addEventListener('input', () => {
+            localStorage.setItem('bilanNotes', bilanNotes.value);
+        });
+
+        // --- Core Functions ---
+        function addPatient(type) {
+            modal.style.display = 'none'; // Hide modal after selection
+            
+            const cardId = `patient-${Date.now()}`;
+            const templateText = templates[type];
+            const typeName = type === 'usic' ? 'USIC' : 'Cardiologie Conventionnelle';
+            
+            const patientCard = document.createElement('div');
+            patientCard.classList.add('patient-card');
+            patientCard.id = cardId;
+            
+            patientCard.innerHTML = `
+                <div class="patient-header">
+                    <span class="patient-type">${typeName}</span>
+                    <div class="patient-actions">
+                        <button class="btn btn-secondary copy-btn">Copier</button>
+                        <button class="btn btn-danger delete-btn">Supprimer</button>
+                    </div>
+                </div>
+                <textarea class="observation-text" placeholder="Écrivez vos observations ici...">${templateText}</textarea>
+            `;
+            
+            patientList.appendChild(patientCard);
+            
+            // Focus on the new textarea
+            const newTextarea = patientCard.querySelector('textarea');
+            if (newTextarea) {
+                newTextarea.focus();
+                // Place cursor at the start of the text for easier editing
+                newTextarea.setSelectionRange(0, 0);
+            }
+        }
+    </script>
 </body>
 </html>
